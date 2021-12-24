@@ -1,5 +1,5 @@
 asset: woorl
-tap: valitydev/homebrew-tap/Formula/woorl.rb
+tap: valitydev/homebrew-tap/woorl.rb
 template: |
   class Woorl < Formula
     desc     "$REPO_DESCRIPTION"
