@@ -19,3 +19,4 @@ template: |
       system "#{bin}/woorl"
     end
   end
+branches: ft/tap_release_testing
