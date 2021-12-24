@@ -1,4 +1,4 @@
-asset: woorl
+url: "https://github.com/valitydev/woorl/releases/download/$VERSION_NUMBER/woorl"
 tap: valitydev/homebrew-tap/woorl.rb
 template: |
   class Woorl < Formula
