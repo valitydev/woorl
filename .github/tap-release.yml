@@ -1,4 +1,4 @@
-asset: woorl
+asset: test.zip
 tap: valitydev/homebrew-tap/woorl.rb
 template: |
   class Woorl < Formula
