@@ -29,7 +29,7 @@ jobs:
           sinceTag: ${{ fromJSON(steps.latest_release.outputs.data).tag_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish release
-        uses: ncipollo/release-action@v1.8.9
+        uses: ncipollo/release-action@v1.9.0
         with:
           artifacts: "_build/default/bin/*"
           bodyFile: ${{ steps.changelog.outputs.filename }}
