@@ -9,8 +9,8 @@ on:
 
 env:
   ASSETS: |
-    woorl-${{ github.ref_name }}-linux-amd64.tar.gz
-    woorl-${{ github.ref_name }}-darwin-arm64.tar.gz
+    woorl-test-linux-amd64.tar.gz
+    woorl-test-darwin-arm64.tar.gz
 
 jobs:
   escript:
