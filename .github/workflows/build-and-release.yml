@@ -9,17 +9,8 @@ on:
 
 env:
   ASSETS: |
-    woorl-${{ github.ref_name }}-linux-amd64.tar.gz
-    woorl-${{ github.ref_name }}-linux-arm64.tar.gz
-    woorl-${{ github.ref_name }}.arm64_big_sur.bottle.tar.gz
-    woorl-${{ github.ref_name }}.arm64_monterey.bottle.tar.gz
-    woorl-${{ github.ref_name }}.big_sur.bottle.tar.gz
-    woorl-${{ github.ref_name }}.catalina.bottle.tar.gz
-    woorl-${{ github.ref_name }}.el_capitan.bottle.tar.gz
-    woorl-${{ github.ref_name }}.high_sierra.bottle.tar.gz
-    woorl-${{ github.ref_name }}.mojave.bottle.tar.gz
-    woorl-${{ github.ref_name }}.monterey.bottle.tar.gz
-    woorl-${{ github.ref_name }}.sierra.bottle.tar.gz
+    woorl-${{ github.ref_name }}.tar.gz
+    woorl-${{ github.ref_name }}.all.bottle.tar.gz
 
 jobs:
   escript:
@@ -34,7 +25,7 @@ jobs:
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         run: |
           mkdir dist
-          for asset in $ASSETS; do tar -czvf dist/$asset -C _build/default/bin/ woorl; done
+          for asset in $ASSETS; do tar -czvf dist/$asset -C _build/default/bin/ woorl woorl-json; done
       - name: Release
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
