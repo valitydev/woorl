@@ -26,6 +26,9 @@ jobs:
         run: |
           mkdir dist
           for asset in $ASSETS; do tar -czvf dist/$asset -C _build/default/bin/ woorl; done
+      - name: Check dist
+        run: |
+          ls dist/
       - name: Release
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
