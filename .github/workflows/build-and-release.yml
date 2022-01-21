@@ -7,11 +7,6 @@ on:
     tags:
       - "[0-9].*"
 
-env:
-  ASSETS: |
-    woorl-${{ github.ref_name }}.tar.gz
-    woorl-${{ github.ref_name }}.all.bottle.tar.gz
-
 jobs:
   escript:
     runs-on: ubuntu-latest
@@ -23,9 +18,7 @@ jobs:
         run: rebar3 escriptize
       - name: Make dist
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
-        run: |
-          mkdir dist
-          for asset in $ASSETS; do tar -czvf dist/$asset -C _build/default/bin/ woorl woorl-json; done
+        run: tar -czvf dist/woorl-${{ github.ref_name }}.tar.gz -C _build/default/bin/ woorl woorl-json
       - name: Release
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
