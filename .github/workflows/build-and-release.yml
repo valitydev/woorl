@@ -13,7 +13,7 @@ jobs:
     container: erlang:23
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Build escript
         run: rebar3 escriptize
       - name: Make dist
