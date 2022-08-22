@@ -13,7 +13,7 @@
         snowflake,
         getopt,
         cf,
-        jsx
+        jsone
     ]},
     {env, []},
     {modules, []},

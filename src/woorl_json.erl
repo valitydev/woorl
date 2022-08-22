@@ -8,15 +8,15 @@
 
 %%
 
--spec decode(string() | binary()) -> jsx:json_term().
+-spec decode(string() | binary()) -> jsone:json_value().
 decode(S) when is_binary(S) ->
-    jsx:decode(S, [{labels, binary}, {return_maps, false}]);
+    jsone:decode(S, [{keys, binary}, {object_format, proplist}]);
 decode(S) when is_list(S) ->
     decode(unicode:characters_to_binary(S)).
 
--spec encode(jsx:json_term()) -> binary().
+-spec encode(jsone:json_value()) -> binary().
 encode(J) ->
-    jsx:encode(J, [space, {indent, 2}]).
+    jsone:encode(J, [native_utf8, native_forward_slash, {space, 1}, {indent, 2}]).
 
 %%
 
@@ -24,7 +24,7 @@ encode(J) ->
 -define(is_number(T), (?is_integer(T) orelse T == double)).
 -define(is_scalar(T), (?is_number(T) orelse T == string orelse element(1, T) == enum)).
 
--spec json_to_term(jsx:json_term(), woorl_thrift:type()) -> term().
+-spec json_to_term(jsone:json_value(), woorl_thrift:type()) -> term().
 json_to_term(Json, Type) ->
     json_to_term(Json, Type, []).
 
@@ -151,7 +151,7 @@ json_content_to_string(<<"base64">>, Content) ->
 
 %%
 
--spec term_to_json(term(), woorl_thrift:type()) -> jsx:json_term().
+-spec term_to_json(term(), woorl_thrift:type()) -> jsone:json_value().
 term_to_json(Term, Type) ->
     term_to_json(Term, Type, []).
 
@@ -188,7 +188,7 @@ term_to_json(Term, {struct, _, {Mod, Name}}, Stack) when is_atom(Mod), is_atom(N
     {struct, _, StructDef} = Mod:struct_info(Name),
     struct_to_json(Term, StructDef, Stack);
 term_to_json(Term, {enum, _}, _Stack) when is_atom(Term) ->
-    atom_to_binary(Term, utf8);
+    Term;
 term_to_json(Term, Type, _Stack) when is_integer(Term), ?is_integer(Type) ->
     Term;
 term_to_json(Term, double, _Stack) when is_number(Term) ->
@@ -207,7 +207,7 @@ term_to_json(Term, Type, _Stack) ->
 
 union_to_json({Fn, Term}, StructDef, Stack) ->
     {_N, _Req, Type, Fn, _Def} = lists:keyfind(Fn, 4, StructDef),
-    [{atom_to_binary(Fn, utf8), term_to_json(Term, Type, [Fn | Stack])}].
+    [{Fn, term_to_json(Term, Type, [Fn | Stack])}].
 
 struct_to_json(Struct, StructDef, Stack) ->
     [_ | Fields] = tuple_to_list(Struct),
@@ -216,7 +216,7 @@ struct_to_json(Struct, StructDef, Stack) ->
             ({undefined, _}, A) ->
                 A;
             ({Term, {_N, _Req, Type, Fn, _Def}}, A) ->
-                [{atom_to_binary(Fn, utf8), term_to_json(Term, Type, [Fn | Stack])} | A]
+                [{Fn, term_to_json(Term, Type, [Fn | Stack])} | A]
         end,
         [],
         lists:zip(Fields, StructDef)

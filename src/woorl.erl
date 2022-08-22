@@ -120,7 +120,7 @@ main(Args) ->
             Script = woorl_json,
             ok = set_global(script, Script),
             {Op, Type, Input} = parse_options(Script, Args),
-            io:format(standard_io, "~s", [convert_input(Op, Type, Input)]);
+            file:write(standard_io, convert_input(Op, Type, Input));
         _Otherwise ->
             Script = woorl,
             ok = set_global(script, Script),
@@ -310,12 +310,12 @@ get_deadline(Opts) ->
 report_call_result({ok, ok}, _) ->
     ok;
 report_call_result({ok, Reply}, Schema) ->
-    report_reply(render_reply(Reply, Schema));
+    ok = report_reply(render_reply(Reply, Schema));
 report_call_result({exception, Exception}, Schema) ->
-    report_exception(render_exception(Exception, Schema)),
+    ok = report_exception(render_exception(Exception, Schema)),
     abort(?EXCEPTION);
 report_call_result({error, Error}, _) ->
-    report_error({woody_error, Error}),
+    ok = report_error({woody_error, Error}),
     abort(?WOODY_ERROR).
 
 render_reply(Reply, Schema) ->
@@ -434,7 +434,7 @@ get_global(N) ->
 
 report_error(Why) ->
     {Format, Args} = format_error(Why),
-    io:format(standard_error, "~s", [cf:format("~!R[ERROR]~!! " ++ Format, Args)]).
+    file:write(standard_error, cf:format("~!R[ERROR]~!! " ++ Format, Args)).
 
 format_error({invalid_option, Opt}) ->
     {"Invalid option ~!^~s~!!~n", [Opt]};
@@ -494,7 +494,7 @@ format_path_part(V) ->
 report_progress(What) ->
     {Format, Args} = format_progress(What),
     get_global(verbose) andalso
-        io:format(standard_error, "~s", [cf:format("~!^[DEBUG]~!! " ++ Format, Args)]).
+        file:write(standard_error, cf:format("~!^[DEBUG]~!! " ++ Format, Args)).
 
 format_progress({woody, #{trace_id := RpcID}, Event, Meta}) ->
     {"[~s] ~s: ~64000tp~n", [RpcID, Event, Meta]};
@@ -502,25 +502,25 @@ format_progress(Why) ->
     {"~p~n", [Why]}.
 
 report_reply(R) ->
-    io:format(standard_io, "~s", [R]).
+    file:write(standard_io, R).
 
 report_exception(R) ->
     report_reply(R).
 
 -spec abort_with_usage(term()) -> no_return().
 abort_with_usage(Why) ->
-    report_error(Why),
-    report_usage(get_global(script)),
+    ok = report_error(Why),
+    ok = report_usage(get_global(script)),
     abort(?INPUT_ERROR).
 
 -spec exit_with_usage() -> no_return().
 exit_with_usage() ->
-    report_usage(get_global(script)),
+    ok = report_usage(get_global(script)),
     abort(?SUCCESS).
 
 -spec abort(1..255, term()) -> no_return().
 abort(Code, Why) ->
-    report_error(Why),
+    ok = report_error(Why),
     abort(Code).
 
 -spec abort(1..255) -> no_return().
