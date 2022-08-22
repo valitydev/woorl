@@ -8,15 +8,15 @@
 
 %%
 
--spec decode(string() | binary()) -> jsx:json_term().
+-spec decode(string() | binary()) -> jsone:json_value().
 decode(S) when is_binary(S) ->
-    jsx:decode(S, [{labels, binary}, {return_maps, false}]);
+    jsone:decode(S, [{keys, binary}, {object_format, proplist}]);
 decode(S) when is_list(S) ->
     decode(unicode:characters_to_binary(S)).
 
--spec encode(jsx:json_term()) -> binary().
+-spec encode(jsone:json_value()) -> binary().
 encode(J) ->
-    jsx:encode(J, [space, {indent, 2}]).
+    jsone:encode(J, [native_utf8, native_forward_slash, {space, 1}, {indent, 2}]).
 
 %%
 
