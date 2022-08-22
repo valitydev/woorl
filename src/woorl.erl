@@ -310,12 +310,12 @@ get_deadline(Opts) ->
 report_call_result({ok, ok}, _) ->
     ok;
 report_call_result({ok, Reply}, Schema) ->
-    report_reply(render_reply(Reply, Schema));
+    ok = report_reply(render_reply(Reply, Schema));
 report_call_result({exception, Exception}, Schema) ->
-    report_exception(render_exception(Exception, Schema)),
+    ok = report_exception(render_exception(Exception, Schema)),
     abort(?EXCEPTION);
 report_call_result({error, Error}, _) ->
-    report_error({woody_error, Error}),
+    ok = report_error({woody_error, Error}),
     abort(?WOODY_ERROR).
 
 render_reply(Reply, Schema) ->
@@ -509,18 +509,18 @@ report_exception(R) ->
 
 -spec abort_with_usage(term()) -> no_return().
 abort_with_usage(Why) ->
-    report_error(Why),
-    report_usage(get_global(script)),
+    ok = report_error(Why),
+    ok = report_usage(get_global(script)),
     abort(?INPUT_ERROR).
 
 -spec exit_with_usage() -> no_return().
 exit_with_usage() ->
-    report_usage(get_global(script)),
+    ok = report_usage(get_global(script)),
     abort(?SUCCESS).
 
 -spec abort(1..255, term()) -> no_return().
 abort(Code, Why) ->
-    report_error(Why),
+    ok = report_error(Why),
     abort(Code).
 
 -spec abort(1..255) -> no_return().
