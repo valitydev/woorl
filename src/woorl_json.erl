@@ -24,7 +24,7 @@ encode(J) ->
 -define(is_number(T), (?is_integer(T) orelse T == double)).
 -define(is_scalar(T), (?is_number(T) orelse T == string orelse element(1, T) == enum)).
 
--spec json_to_term(jsx:json_term(), woorl_thrift:type()) -> term().
+-spec json_to_term(jsone:json_value(), woorl_thrift:type()) -> term().
 json_to_term(Json, Type) ->
     json_to_term(Json, Type, []).
 
@@ -151,7 +151,7 @@ json_content_to_string(<<"base64">>, Content) ->
 
 %%
 
--spec term_to_json(term(), woorl_thrift:type()) -> jsx:json_term().
+-spec term_to_json(term(), woorl_thrift:type()) -> jsone:json_value().
 term_to_json(Term, Type) ->
     term_to_json(Term, Type, []).
 
