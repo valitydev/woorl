@@ -188,7 +188,7 @@ term_to_json(Term, {struct, _, {Mod, Name}}, Stack) when is_atom(Mod), is_atom(N
     {struct, _, StructDef} = Mod:struct_info(Name),
     struct_to_json(Term, StructDef, Stack);
 term_to_json(Term, {enum, _}, _Stack) when is_atom(Term) ->
-    atom_to_binary(Term, utf8);
+    Term;
 term_to_json(Term, Type, _Stack) when is_integer(Term), ?is_integer(Type) ->
     Term;
 term_to_json(Term, double, _Stack) when is_number(Term) ->
@@ -207,7 +207,7 @@ term_to_json(Term, Type, _Stack) ->
 
 union_to_json({Fn, Term}, StructDef, Stack) ->
     {_N, _Req, Type, Fn, _Def} = lists:keyfind(Fn, 4, StructDef),
-    [{atom_to_binary(Fn, utf8), term_to_json(Term, Type, [Fn | Stack])}].
+    [{Fn, term_to_json(Term, Type, [Fn | Stack])}].
 
 struct_to_json(Struct, StructDef, Stack) ->
     [_ | Fields] = tuple_to_list(Struct),
@@ -216,7 +216,7 @@ struct_to_json(Struct, StructDef, Stack) ->
             ({undefined, _}, A) ->
                 A;
             ({Term, {_N, _Req, Type, Fn, _Def}}, A) ->
-                [{atom_to_binary(Fn, utf8), term_to_json(Term, Type, [Fn | Stack])} | A]
+                [{Fn, term_to_json(Term, Type, [Fn | Stack])} | A]
         end,
         [],
         lists:zip(Fields, StructDef)
