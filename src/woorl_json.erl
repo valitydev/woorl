@@ -247,9 +247,37 @@ getv(Key, Opts, Default) ->
         false -> Default
     end.
 
-is_printable_string(Term) ->
-    % NOTE
-    % This approach wastes heap space, it's better to do this in a streaming manner with the help
-    % of `string:next_codepoint/1`, though that would require factoring out
-    % `io_lib:printable_unicode_list/1` implementation here, into `is_printable_char/1`.
-    io_lib:printable_unicode_list(unicode:characters_to_list(Term)).
+is_printable_string(<<>>) ->
+    true;
+is_printable_string(S) ->
+    case string:next_codepoint(S) of
+        [C | Rest] ->
+            printable_unicode_char(C) andalso is_printable_string(Rest);
+        {error, _} ->
+            false
+    end.
+
+printable_unicode_char(C) when is_integer(C), C >= $\040, C =< $\176 ->
+    true;
+printable_unicode_char(C) when
+    is_integer(C), C >= 16#A0, C < 16#D800;
+    is_integer(C), C > 16#DFFF, C < 16#FFFE;
+    is_integer(C), C > 16#FFFF, C =< 16#10FFFF
+->
+    true;
+printable_unicode_char($\n) ->
+    true;
+printable_unicode_char($\r) ->
+    true;
+printable_unicode_char($\t) ->
+    true;
+printable_unicode_char($\v) ->
+    true;
+printable_unicode_char($\b) ->
+    true;
+printable_unicode_char($\f) ->
+    true;
+printable_unicode_char($\e) ->
+    true;
+printable_unicode_char(_) ->
+    false.
