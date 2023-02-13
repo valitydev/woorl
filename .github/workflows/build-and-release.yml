@@ -10,7 +10,7 @@ on:
 jobs:
   escript:
     runs-on: ubuntu-latest
-    container: erlang:23
+    container: erlang:25
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
