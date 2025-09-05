@@ -50,6 +50,7 @@ non_printable_test_() ->
 enum_map_test_() ->
     T = {map, {enum, {?MODULE, testEnum}}, i32},
     V = #{red => 42, indeterminate => 43},
+    %% TODO/FIXME Map order is different in Erlang 27
     J = [{<<"red">>, 42}, {<<"indeterminate">>, 43}],
     [
         ?_assertEqual(J, woorl_json:term_to_json(V, T)),
@@ -65,6 +66,22 @@ test_json_1() ->
             {<<"key">>, [[42.42], []]},
             {<<"value">>, [
                 {<<"127">>, [
+                    %% TODO/FIXME Since 1.7 testcases for json_to_term
+                    %% and term_to_json are broken.
+                    %% For some reason after migration to jsone
+                    %% atom_to_binary calls were removed and
+                    %% term-encoded json with enums and structs now
+                    %% contains atoms (!). Which in result breaks
+                    %% json-encoding of that kind of a term, since it
+                    %% does attempt to get value from json data with
+                    %% atom_to_binary, like so:
+                    %%
+                    %%    FJson = getv(atom_to_binary(Fn, utf8), Json, Def),
+                    %%
+                    %% It is necessary to figure out the correct
+                    %% approach, considering the existing usage of
+                    %% this utility in production. Then, adjust or
+                    %% replace the tests.
                     {<<"tp">>, <<"black">>},
                     {<<"name">>, <<"magic">>},
                     {<<"parent">>, [
