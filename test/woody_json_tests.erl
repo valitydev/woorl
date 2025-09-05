@@ -68,6 +68,7 @@ test_json_1() ->
                 {<<"127">>, [
                     %% TODO/FIXME Since 1.7 testcases for json_to_term
                     %% and term_to_json are broken.
+                    %% (https://github.com/valitydev/woorl/commit/6f8710ab9fbdf56e7d90eb34e5ea23492fedb55b)
                     %% For some reason after migration to jsone
                     %% atom_to_binary calls were removed and
                     %% term-encoded json with enums and structs now
