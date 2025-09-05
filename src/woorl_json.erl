@@ -170,6 +170,7 @@ term_to_json(Term, {map, KType, VType}, Stack) when is_map(Term), ?is_scalar(KTy
 term_to_json(Term, {map, KType, VType}, Stack) when is_map(Term) ->
     maps:fold(
         fun(K, V, A) ->
+    ct:print("~p~n", [{KType, VType}]),
             [
                 [
                     {<<"key">>, term_to_json(K, KType, [key, K | Stack])},
@@ -211,11 +212,13 @@ union_to_json({Fn, Term}, StructDef, Stack) ->
 
 struct_to_json(Struct, StructDef, Stack) ->
     [_ | Fields] = tuple_to_list(Struct),
+    ct:print("Struct: ~p~n", [Struct]),
     lists:foldr(
         fun
             ({undefined, _}, A) ->
                 A;
             ({Term, {_N, _Req, Type, Fn, _Def}}, A) ->
+    ct:print("Field: ~p~n", [{Term, A}]),
                 [{Fn, term_to_json(Term, Type, [Fn | Stack])} | A]
         end,
         [],
