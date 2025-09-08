@@ -1,16 +1,13 @@
-# general
-log
+# Build artifacts
 /_build/
-*~
-erl_crash.dump
-.tags*
-*.sublime-workspace
-.DS_Store
+*.o
+*.beam
+*.plt
 
-# wercker
-/_builds/
-/_cache/
-/_projects/
-/_steps/
-/_temp/
-/.wercker/
+# Run artifacts
+erl_crash.dump
+log
+
+# make stuff
+/.image.*
+Makefile.env

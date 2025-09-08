@@ -92,7 +92,7 @@ json_to_term_(Json, {struct, _, {Mod, Name}}, Stack) when is_atom(Mod), is_atom(
     json_to_struct(Json, StructDef, Mod:record_name(Name), Stack);
 json_to_term_(Json, string, _Stack) when is_binary(Json) ->
     Json;
-json_to_term_(Json = [{_, _} | _], string, _Stack) ->
+json_to_term_([{_, _} | _] = Json, string, _Stack) ->
     CType = getv(<<"content_type">>, Json),
     Content = getv(<<"content">>, Json),
     json_content_to_string(CType, Content);
@@ -113,13 +113,13 @@ json_to_term_(Json, i64, _Stack) when is_integer(Json), Json >= -(1 bsl 63), Jso
 json_to_term_(_Json, _Type, _Stack) ->
     error(badarg).
 
-json_propkey_to_term(P, Type = string, Stack) ->
+json_propkey_to_term(P, string = Type, Stack) ->
     json_to_term_(P, Type, Stack);
-json_propkey_to_term(P, Type = {enum, _}, Stack) ->
+json_propkey_to_term(P, {enum, _} = Type, Stack) ->
     json_to_term_(P, Type, Stack);
 json_propkey_to_term(P, Type, Stack) when ?is_integer(Type) ->
     json_to_term_(binary_to_integer(P), Type, Stack);
-json_propkey_to_term(P, Type = double, Stack) ->
+json_propkey_to_term(P, double = Type, Stack) ->
     json_to_term_(
         try
             binary_to_float(P)
