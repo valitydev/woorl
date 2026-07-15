@@ -10,6 +10,10 @@
 
 -export([handle_event/4]).
 
+-ifdef(TEST).
+-export([make_transport_opts/1]).
+-endif.
+
 %%
 
 -define(SUCCESS, 0).
@@ -256,12 +260,41 @@ issue_call(Url, Request, Opts) ->
     ReqID = require_option(reqid, Opts),
     RpcID = woody_context:new_rpc_id(<<"undefined">>, ReqID, woody_context:new_req_id()),
     Context = apply_options_to_context(Opts, woody_context:new(RpcID)),
-    CallOpts = #{url => Url, event_handler => ?MODULE},
+    CallOpts = #{
+        url => Url,
+        event_handler => ?MODULE,
+        transport_opts => make_transport_opts(Context)
+    },
     try
         woody_client:call(Request, CallOpts, Context)
     catch
         error:{woody_error, Reason} ->
             {error, Reason}
+    end.
+
+%% By default woody caps connect and send timeouts at 1000ms regardless of the
+%% deadline (see woody_client_thrift_http_transport:calc_timeouts/1), so an
+%% explicit --deadline would be silently ignored for anything but receiving the
+%% response. Let the deadline govern connect and send timeouts as well; woody
+%% merges these with application precedence, so recv_timeout still comes from the
+%% deadline.
+-spec make_transport_opts(woody_context:ctx()) -> woody_client_thrift_http_transport:transport_options().
+make_transport_opts(Context) ->
+    case woody_context:get_deadline(Context) of
+        undefined ->
+            #{};
+        Deadline ->
+            Timeout = deadline_to_timeout(Deadline),
+            #{connect_timeout => Timeout, send_timeout => Timeout}
+    end.
+
+-spec deadline_to_timeout(woody:deadline()) -> non_neg_integer().
+deadline_to_timeout(Deadline) ->
+    try
+        woody_deadline:to_timeout(Deadline)
+    catch
+        error:deadline_reached ->
+            0
     end.
 
 apply_options_to_context(Opts, Context) ->
